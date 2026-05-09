@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Producer Daily">
+<title>Producer Daily</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f5f5f3;
+    --surface: #ffffff;
+    --surface2: #ebebea;
+    --text: #1a1a1a;
+    --text2: #6b6b67;
+    --text3: #a0a09c;
+    --border: rgba(0,0,0,0.09);
+    --border2: rgba(0,0,0,0.16);
+    --purple: #534AB7;
+    --purple-light: #EEEDFE;
+    --purple-dark: #3C3489;
+    --green: #1D9E75;
+    --amber: #EF9F27;
+    --red: #E24B4A;
+    --radius: 12px;
+    --radius-lg: 16px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141414;
+      --surface: #1f1f1f;
+      --surface2: #2a2a2a;
+      --text: #f0f0ee;
+      --text2: #a0a09c;
+      --text3: #6b6b67;
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.15);
+      --purple-light: #26215C;
+      --purple-dark: #CECBF6;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 40px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .top-bar {
+    background: var(--surface);
+    border-bottom: 0.5px solid var(--border);
+    padding: 16px 16px 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .top-inner {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+
+  h1 { font-size: 20px; font-weight: 600; color: var(--text); }
+  .date-label { font-size: 13px; color: var(--text2); }
+
+  .nav-group { display: flex; gap: 6px; }
+
+  button {
+    background: var(--surface2);
+    border: none;
+    border-radius: 8px;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 8px 14px;
+    font-family: inherit;
+    font-weight: 500;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.1s;
+  }
+  button:active { opacity: 0.7; }
+
+  .content {
+    padding: 16px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .metric {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    border: 0.5px solid var(--border);
+  }
+
+  .metric-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+  .metric-value { font-size: 24px; font-weight: 600; color: var(--text); }
+
+  .progress-bar-wrap {
+    height: 8px;
+    border-radius: 999px;
+    background: var(--surface2);
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--purple);
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .progress-label { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
+
+  .section-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 8px;
+    margin-top: 20px;
+  }
+
+  .hab-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 14px;
+    margin-bottom: 6px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 52px;
+    transition: transform 0.1s;
+  }
+
+  .hab-row:active { opacity: 0.7; transform: scale(0.98); }
+  .hab-row.suggested { border-style: dashed; background: var(--surface2); }
+
+  .hab-check {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    border: 1.5px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    color: white;
+    font-size: 14px;
+  }
+
+  .hab-check.done { background: var(--purple); border-color: var(--purple); }
+
+  .hab-emoji { font-size: 20px; flex-shrink: 0; line-height: 1; }
+
+  .hab-label { font-size: 15px; color: var(--text); flex: 1; line-height: 1.3; }
+  .hab-label.done { color: var(--text3); text-decoration: line-through; }
+
+  .key-badge {
+    font-size: 10px;
+    background: var(--purple-light);
+    color: var(--purple-dark);
+    padding: 3px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    font-weight: 600;
+  }
+
+  .freq-badge { font-size: 11px; color: var(--text3); flex-shrink: 0; }
+
+  .chart-wrap { position: relative; width: 100%; height: 180px; margin-top: 8px; }
+
+  .save-note {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--text2);
+    border: 0.5px solid var(--border);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  .install-tip {
+    background: var(--purple-light);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--purple-dark);
+    margin-bottom: 16px;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .motivational {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text3);
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-inner">
+    <div class="top-row">
+      <div>
+        <h1>🎛️ Producer daily</h1>
+        <p class="date-label" id="dateDisplay"></p>
+      </div>
+      <div class="nav-group">
+        <button onclick="changeDay(-1)" aria-label="Previous day"><i class="ti ti-chevron-left"></i></button>
+        <button onclick="goToday()">Today</button>
+        <button onclick="changeDay(1)" aria-label="Next day"><i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+
+  <div class="install-tip">
+    📱 On iPhone? Tap Share → "Add to Home Screen" to use this like an app.
+  </div>
+
+  <div class="save-note">
+    💾 Your data saves automatically. Don't clear browser data or you'll lose progress.
+  </div>
+
+  <p class="motivational" id="motiveLine">Every day is a step closer 🚀</p>
+
+  <div class="metrics">
+    <div class="metric">
+      <p class="metric-label">Today</p>
+      <p class="metric-value" id="todayScore">0%</p>
+    </div>
+    <div class="metric">
+      <p class="metric-label">7-day avg</p>
+      <p class="metric-value" id="weekAvg">0%</p>
+    </div>
+    <div class="metric">
+      <p class="metric-label">🔥 Streak</p>
+      <p class="metric-value" id="bestStreak">0d</p>
+    </div>
+    <div class="metric">
+      <p class="metric-label">✅ Done</p>
+      <p class="metric-value" id="habitsCount">0/0</p>
+    </div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
+  <p class="progress-label" id="progressLabel">0 of 0 habits complete</p>
+
+  <p class="section-title">🌅 Daily habits</p>
+  <div id="dailyHabits"></div>
+
+  <p class="section-title">📅 Weekly habits</p>
+  <div id="weeklyHabits"></div>
+
+  <p class="section-title">💡 Suggested</p>
+  <div id="suggestedHabits"></div>
+
+  <p class="section-title">📈 7-day progress</p>
+  <div class="chart-wrap">
+    <canvas id="progressChart" role="img" aria-label="7 day habit completion percentage bar chart">Habit completion over the last 7 days.</canvas>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const DAILY=[
+  {id:'room',label:'Tidy room',emoji:'🧹',important:false},
+  {id:'sleep',label:'Early night (by midnight)',emoji:'🌙',important:false},
+  {id:'promo',label:'Music promo',emoji:'📣',important:true},
+  {id:'eat',label:'Eat healthy',emoji:'🥗',important:false},
+  {id:'outreach',label:'Industry outreach',emoji:'🤝',important:true},
+  {id:'theory',label:'Music theory / keys',emoji:'🎹',important:false},
+  {id:'sax',label:'Saxophone practice',emoji:'🎷',important:false},
+  {id:'listen',label:'Active listening',emoji:'🎧',important:false},
+  {id:'uni',label:'Uni work',emoji:'📚',important:false},
+];
+const WEEKLY=[
+  {id:'email',label:'Email mailing list',emoji:'📧',freq:'1×/wk'},
+  {id:'release',label:'Release a song',emoji:'🚀',freq:'1×/wk'},
+  {id:'gym',label:'Gym or climbing',emoji:'💪',freq:'3×/wk'},
+  {id:'cardio',label:'Run or cardio',emoji:'🏃',freq:'1×/wk'},
+];
+const SUGGESTED=[
+  {id:'sug1',label:'Read industry news',emoji:'📰'},
+  {id:'sug2',label:'Meditate (5 min)',emoji:'🧘'},
+  {id:'sug3',label:'Drink 2L water',emoji:'💧'},
+  {id:'sug4',label:'Network on socials',emoji:'📱'},
+];
+const ALL=[...DAILY,...WEEKLY];
+
+const MOTIVES=[
+  'Every day is a step closer 🚀',
+  'The grind is the goal 🎯',
+  'Future you will thank you 🙏',
+  'No days off on the road to the top 👑',
+  'Build the habit, build the career 🎛️',
+  'Stay consistent, stay winning 💎',
+  'UK rap needs your sound 🎤',
+];
+
+function loadData(){try{return JSON.parse(localStorage.getItem('producer_habits')||'{}');}catch{return {};}}
+function saveData(d){try{localStorage.setItem('producer_habits',JSON.stringify(d));}catch{}}
+
+let data=loadData();
+let currentDate=new Date();
+currentDate.setHours(0,0,0,0);
+
+function dateKey(d){return d.toISOString().split('T')[0];}
+function getDayData(d){const k=dateKey(d);if(!data[k])data[k]={};return data[k];}
+
+function toggleHabit(id){
+  const d=getDayData(currentDate);
+  d[id]=!d[id];
+  saveData(data);
+  render();
+}
+
+function calcScore(d){
+  const dd=getDayData(d);
+  const done=ALL.filter(h=>dd[h.id]).length;
+  return ALL.length>0?Math.round((done/ALL.length)*100):0;
+}
+
+function changeDay(n){currentDate=new Date(currentDate);currentDate.setDate(currentDate.getDate()+n);render();}
+function goToday(){currentDate=new Date();currentDate.setHours(0,0,0,0);render();}
+
+function calcStreak(){
+  let streak=0,d=new Date(currentDate);
+  while(streak<365){if(calcScore(d)>=50){streak++;d.setDate(d.getDate()-1);}else break;}
+  return streak;
+}
+
+function getMotiveLine(pct){
+  if(pct===100) return "PERFECT DAY! You're built different 👑🔥";
+  if(pct>=80) return "Almost there, don't stop now 💪";
+  if(pct>=50) return "Halfway through, keep pushing 🎯";
+  if(pct>0) return "Good start, keep the momentum going 🚀";
+  return MOTIVES[new Date().getDay()%MOTIVES.length];
+}
+
+function makeHabitHTML(h,dd,isSug){
+  const done=!!dd[h.id];
+  return `<div class="hab-row${isSug?' suggested':''}" onclick="toggleHabit('${h.id}')">
+    <div class="hab-check${done?' done':''}">
+      ${done?'<i class="ti ti-check" aria-hidden="true"></i>':''}
+    </div>
+    <span class="hab-emoji">${h.emoji}</span>
+    <span class="hab-label${done?' done':''}">${h.label}</span>
+    ${h.important?'<span class="key-badge">🔑 key</span>':''}
+    ${h.freq?`<span class="freq-badge">${h.freq}</span>`:''}
+  </div>`;
+}
+
+let chart;
+function renderChart(){
+  const labels=[],scores=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date(currentDate);
+    d.setDate(d.getDate()-i);
+    labels.push(d.toLocaleDateString('en-GB',{weekday:'short'}));
+    scores.push(calcScore(d));
+  }
+  if(chart)chart.destroy();
+  const isDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const tickColor=isDark?'#a0a09c':'#6b6b67';
+  const gridColor=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+  chart=new Chart(document.getElementById('progressChart'),{
+    type:'bar',
+    data:{labels,datasets:[{
+      label:'%',
+      data:scores,
+      backgroundColor:scores.map(s=>s>=80?'#534AB7':s>=50?'#EF9F27':'#E24B4A'),
+      borderRadius:6,
+    }]},
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{min:0,max:100,ticks:{callback:v=>v+'%',font:{size:10},color:tickColor},grid:{color:gridColor}},
+        x:{ticks:{font:{size:11},color:tickColor},grid:{display:false}}
+      }
+    }
+  });
+}
+
+function render(){
+  document.getElementById('dateDisplay').textContent=currentDate.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'});
+  const dd=getDayData(currentDate);
+  const done=ALL.filter(h=>dd[h.id]).length;
+  const total=ALL.length;
+  const pct=Math.round((done/total)*100);
+  document.getElementById('todayScore').textContent=pct+'%';
+  document.getElementById('habitsCount').textContent=done+'/'+total;
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=done+' of '+total+' habits complete';
+  document.getElementById('motiveLine').textContent=getMotiveLine(pct);
+  let wt=0;
+  for(let i=6;i>=0;i--){const d=new Date(currentDate);d.setDate(d.getDate()-i);wt+=calcScore(d);}
+  document.getElementById('weekAvg').textContent=Math.round(wt/7)+'%';
+  document.getElementById('bestStreak').textContent=calcStreak()+'d';
+  document.getElementById('dailyHabits').innerHTML=DAILY.map(h=>makeHabitHTML(h,dd,false)).join('');
+  document.getElementById('weeklyHabits').innerHTML=WEEKLY.map(h=>makeHabitHTML(h,dd,false)).join('');
+  document.getElementById('suggestedHabits').innerHTML=SUGGESTED.map(h=>makeHabitHTML(h,dd,true)).join('');
+  renderChart();
+}
+
+render();
+</script>
+</body>
+</html>
